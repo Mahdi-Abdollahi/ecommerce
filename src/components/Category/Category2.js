@@ -1,4 +1,5 @@
 import React from "react";
+import CategoryCard2 from "../Card/CategoryCard/CategoryCard2";
 
 const categories = [
   {
@@ -47,24 +48,7 @@ const Category2 = () => {
 
         <div className="mt-10 space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
           {categories.map((category) => (
-            <a key={category.name} href={category.href} className="group block">
-              <div
-                aria-hidden="true"
-                className="aspect-w-3 aspect-h-2 rounded-lg overflow-hidden group-hover:opacity-75 lg:aspect-w-5 lg:aspect-h-6"
-              >
-                <img
-                  src={category.imageSrc}
-                  alt={category.imageAlt}
-                  className="w-full h-full object-center object-cover"
-                />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-gray-900">
-                {category.name}
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">
-                {category.description}
-              </p>
-            </a>
+            <CategoryCard2 key={category.name} category={category} />
           ))}
         </div>
       </div>

@@ -1,6 +1,8 @@
 import React from "react";
+import CartSummery from "../../components/Cart/CartSummery";
 
-import { CheckIcon, ClockIcon } from "@heroicons/react/solid";
+import { ProductCart } from "../../components/Cart/ProductCartItem";
+import Policy from "../../components/Policy/Policy";
 
 const products = [
   {
@@ -28,36 +30,6 @@ const products = [
   },
   // More products...
 ];
-const policies = [
-  {
-    name: "Free returns",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce/icons/icon-returns-light.svg",
-    description:
-      "Not what you expected? Place it back in the parcel and attach the pre-paid postage stamp.",
-  },
-  {
-    name: "Same day delivery",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce/icons/icon-calendar-light.svg",
-    description:
-      "We offer a delivery service that has never been done before. Checkout today and receive your products within hours.",
-  },
-  {
-    name: "All year discount",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce/icons/icon-gift-card-light.svg",
-    description:
-      'Looking for a deal? You can use the code "ALLYEAR" at checkout and get money off all year round.',
-  },
-  {
-    name: "For the planet",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce/icons/icon-planet-light.svg",
-    description:
-      "We’ve pledged 1% of sales to the preservation and restoration of the natural environment.",
-  },
-];
 
 const ShoppingCart = () => {
   return (
@@ -75,99 +47,9 @@ const ShoppingCart = () => {
                   Items in your shopping cart
                 </h2>
 
-                <ul
-                  role="list"
-                  className="border-t border-b border-gray-200 divide-y divide-gray-200"
-                >
+                <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
                   {products.map((product, productIdx) => (
-                    <li key={product.id} className="flex py-6 sm:py-10">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={product.imageSrc}
-                          alt={product.imageAlt}
-                          className="w-24 h-24 rounded-lg object-center object-cover sm:w-32 sm:h-32"
-                        />
-                      </div>
-
-                      <div className="relative ml-4 flex-1 flex flex-col justify-between sm:ml-6">
-                        <div>
-                          <div className="flex justify-between sm:grid sm:grid-cols-2">
-                            <div className="pr-6">
-                              <h3 className="text-sm">
-                                <a
-                                  href={product.href}
-                                  className="font-medium text-gray-700 hover:text-gray-800"
-                                >
-                                  {product.name}
-                                </a>
-                              </h3>
-                              <p className="mt-1 text-sm text-gray-500">
-                                {product.color}
-                              </p>
-                              {product.size ? (
-                                <p className="mt-1 text-sm text-gray-500">
-                                  {product.size}
-                                </p>
-                              ) : null}
-                            </div>
-
-                            <p className="text-sm font-medium text-gray-900 text-right">
-                              {product.price}
-                            </p>
-                          </div>
-
-                          <div className="mt-4 flex items-center sm:block sm:absolute sm:top-0 sm:left-1/2 sm:mt-0">
-                            <label
-                              htmlFor={`quantity-${productIdx}`}
-                              className="sr-only"
-                            >
-                              Quantity, {product.name}
-                            </label>
-                            <select
-                              id={`quantity-${productIdx}`}
-                              name={`quantity-${productIdx}`}
-                              className="block max-w-full rounded-md border border-gray-300 py-1.5 text-base leading-5 font-medium text-gray-700 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            >
-                              <option value={1}>1</option>
-                              <option value={2}>2</option>
-                              <option value={3}>3</option>
-                              <option value={4}>4</option>
-                              <option value={5}>5</option>
-                              <option value={6}>6</option>
-                              <option value={7}>7</option>
-                              <option value={8}>8</option>
-                            </select>
-
-                            <button
-                              type="button"
-                              className="ml-4 text-sm font-medium text-indigo-600 hover:text-indigo-500 sm:ml-0 sm:mt-3"
-                            >
-                              <span>Remove</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <p className="mt-4 flex text-sm text-gray-700 space-x-2">
-                          {product.inStock ? (
-                            <CheckIcon
-                              className="flex-shrink-0 h-5 w-5 text-green-500"
-                              aria-hidden="true"
-                            />
-                          ) : (
-                            <ClockIcon
-                              className="flex-shrink-0 h-5 w-5 text-gray-300"
-                              aria-hidden="true"
-                            />
-                          )}
-
-                          <span>
-                            {product.inStock
-                              ? "In stock"
-                              : `Ships in ${product.leadTime}`}
-                          </span>
-                        </p>
-                      </div>
-                    </li>
+                    <ProductCart product={{ ...product, productIdx }} />
                   ))}
                 </ul>
               </section>
@@ -177,36 +59,7 @@ const ShoppingCart = () => {
                 aria-labelledby="summary-heading"
                 className="mt-10 sm:ml-32 sm:pl-6"
               >
-                <div className="bg-gray-50 rounded-lg px-4 py-6 sm:p-6 lg:p-8">
-                  <h2 id="summary-heading" className="sr-only">
-                    Order summary
-                  </h2>
-
-                  <div className="flow-root">
-                    <dl className="-my-4 text-sm divide-y divide-gray-200">
-                      <div className="py-4 flex items-center justify-between">
-                        <dt className="text-gray-600">Subtotal</dt>
-                        <dd className="font-medium text-gray-900">$99.00</dd>
-                      </div>
-                      <div className="py-4 flex items-center justify-between">
-                        <dt className="text-gray-600">Shipping</dt>
-                        <dd className="font-medium text-gray-900">$5.00</dd>
-                      </div>
-                      <div className="py-4 flex items-center justify-between">
-                        <dt className="text-gray-600">Tax</dt>
-                        <dd className="font-medium text-gray-900">$8.32</dd>
-                      </div>
-                      <div className="py-4 flex items-center justify-between">
-                        <dt className="text-base font-medium text-gray-900">
-                          Order total
-                        </dt>
-                        <dd className="text-base font-medium text-gray-900">
-                          $112.32
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                </div>
+                <CartSummery />
                 <div className="mt-10">
                   <button
                     type="submit"
@@ -232,44 +85,7 @@ const ShoppingCart = () => {
           </div>
         </div>
 
-        {/* Policy grid */}
-        <section
-          aria-labelledby="policies-heading"
-          className="mt-24 bg-gray-50 border-t border-gray-200"
-        >
-          <h2 id="policies-heading" className="sr-only">
-            Our policies
-          </h2>
-
-          <div className="max-w-7xl mx-auto py-24 px-4 sm:px-6 sm:py-32 lg:px-8">
-            <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0">
-              {policies.map((policy) => (
-                <div
-                  key={policy.name}
-                  className="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
-                >
-                  <div className="md:flex-shrink-0">
-                    <div className="flow-root">
-                      <img
-                        className="-my-1 h-24 w-auto mx-auto"
-                        src={policy.imageSrc}
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-6 md:mt-0 md:ml-4 lg:mt-6 lg:ml-0">
-                    <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-900">
-                      {policy.name}
-                    </h3>
-                    <p className="mt-3 text-sm text-gray-500">
-                      {policy.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Policy />
       </main>
     </div>
   );
