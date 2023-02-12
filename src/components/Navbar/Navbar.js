@@ -1,21 +1,33 @@
-import React from "react";
+import React, { memo, useEffect } from "react";
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
-import {
-  BellIcon,
-  MenuIcon,
-  XIcon,
-  ShoppingBagIcon,
-} from "@heroicons/react/outline";
+import { MenuIcon, XIcon, ShoppingBagIcon } from "@heroicons/react/outline";
 
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllCategories,
+  selectAllCategory,
+} from "../../features/category/categorySlice";
+import { selectCartItems } from "../../features/cart/cartSlice";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const categories = useSelector(selectAllCategory);
+  const cartItems = useSelector(selectCartItems);
+  const cartTotalAmount = cartItems?.reduce(
+    (sum, orderItem) => sum + orderItem.amount,
+    0
+  );
+  useEffect(() => {
+    dispatch(getAllCategories());
+  }, [dispatch]);
+  const selectedCategory = useParams().id;
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -37,37 +49,48 @@ const Navbar = () => {
                 </div>
                 <div className="hidden lg:block lg:ml-6">
                   <div className="flex space-x-4">
-                    {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-                    <Link
-                      to="/"
-                      className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Home
-                    </Link>
-                    <Link
-                      to="/products/1"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Men
-                    </Link>
-                    <Link
-                      to="/products/1"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Women
-                    </Link>
-                    <Link
-                      to="/products/1"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Children
-                    </Link>
-                    <Link
-                      to="/products/1"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Accessories
-                    </Link>
+                    {selectedCategory === "Home" ? (
+                      <Link
+                        to="/"
+                        className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Home
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/"
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Home
+                      </Link>
+                    )}
+
+                    {categories.map((category) => {
+                      const {
+                        attributes: { name },
+                      } = category;
+
+                      if (selectedCategory === name) {
+                        return (
+                          <Link
+                            key={category.id}
+                            to={`/products/${name}`}
+                            className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+                          >
+                            {category.attributes.name}
+                          </Link>
+                        );
+                      }
+                      return (
+                        <Link
+                          key={category.id}
+                          to={`/products/${name}`}
+                          className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                        >
+                          {category.attributes.name}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -92,13 +115,16 @@ const Navbar = () => {
                     />
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                <Link
+                  to="/cart"
+                  className="relative ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                 >
                   <span className="sr-only">View notifications</span>
                   <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                  <span className="absolute top-0 bg-violet-600 rounded-full px-1 text-xs text-white font-bold">
+                    {cartItems && cartTotalAmount}
+                  </span>
+                </Link>
               </div>
               <div className="flex lg:hidden">
                 {/* Mobile menu button */}
@@ -179,42 +205,52 @@ const Navbar = () => {
 
           <Disclosure.Panel className="lg:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-              <Disclosure.Button
-                as={Link}
-                to="/"
-                className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Home
-              </Disclosure.Button>
-              <Disclosure.Button
-                as={Link}
-                to="/products/1"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Women
-              </Disclosure.Button>
-              <Disclosure.Button
-                as={Link}
-                to="/products/1"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Men
-              </Disclosure.Button>
-              <Disclosure.Button
-                as={Link}
-                to="/products/1"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Children
-              </Disclosure.Button>
-              <Disclosure.Button
-                as={Link}
-                to="/products/1"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Accessories
-              </Disclosure.Button>
+              {selectedCategory ? (
+                <Disclosure.Button
+                  as={Link}
+                  to="/"
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Home
+                </Disclosure.Button>
+              ) : (
+                <Disclosure.Button
+                  as={Link}
+                  to="/"
+                  className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Home
+                </Disclosure.Button>
+              )}
+              {categories.map((category) => {
+                const {
+                  attributes: { name },
+                  id,
+                } = category;
+
+                if (selectedCategory === name) {
+                  return (
+                    <Disclosure.Button
+                      as={Link}
+                      to={`/products/${name}`}
+                      key={id}
+                      className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
+                    >
+                      {name}
+                    </Disclosure.Button>
+                  );
+                }
+                return (
+                  <Disclosure.Button
+                    as={Link}
+                    to={`/products/${name}`}
+                    key={id}
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                  >
+                    {name}
+                  </Disclosure.Button>
+                );
+              })}
             </div>
             <div className="pt-4 pb-3 border-t border-gray-700">
               <div className="flex items-center px-5">
@@ -258,4 +294,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

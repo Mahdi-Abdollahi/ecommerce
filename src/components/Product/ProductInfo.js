@@ -6,7 +6,7 @@ function classNames(...classes) {
 }
 
 const ProductInfo = ({ product }) => {
-  const { name, price, rating: _rating, description } = product;
+  const { name, price, rating: _rating = 4, description } = product;
   return (
     <div>
       <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">

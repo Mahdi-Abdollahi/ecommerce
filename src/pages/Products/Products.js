@@ -1,102 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Fragment, useState } from "react";
-import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
-import {
-  ChevronDownIcon,
-  FilterIcon,
-  MinusSmIcon,
-  PlusSmIcon,
-  ViewGridIcon,
-} from "@heroicons/react/solid";
+import { ChevronDownIcon, FilterIcon } from "@heroicons/react/solid";
 import ProductCard1 from "../../components/Card/ProductCard/ProductCard1";
 
+import { useSelector, useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  getCatetegory,
+  selectCategory,
+} from "../../features/category/categorySlice";
+import {
+  getProductsByCategory,
+  getProductsBySubCategories,
+  selectProducts,
+} from "../../features/product/productSlice";
+
 const sortOptions = [
-  { name: "Most Popular", href: "#", current: true },
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
-];
-const subCategories = [
-  { name: "Totes", href: "#" },
-  { name: "Backpacks", href: "#" },
-  { name: "Travel Bags", href: "#" },
-  { name: "Hip Bags", href: "#" },
-  { name: "Laptop Sleeves", href: "#" },
-];
-const filters = [
-  {
-    id: "color",
-    name: "Color",
-    options: [
-      { value: "white", label: "White", checked: false },
-      { value: "beige", label: "Beige", checked: false },
-      { value: "blue", label: "Blue", checked: true },
-      { value: "brown", label: "Brown", checked: false },
-      { value: "green", label: "Green", checked: false },
-      { value: "purple", label: "Purple", checked: false },
-    ],
-  },
-  {
-    id: "category",
-    name: "Category",
-    options: [
-      { value: "new-arrivals", label: "New Arrivals", checked: false },
-      { value: "sale", label: "Sale", checked: false },
-      { value: "travel", label: "Travel", checked: true },
-      { value: "organization", label: "Organization", checked: false },
-      { value: "accessories", label: "Accessories", checked: false },
-    ],
-  },
-  {
-    id: "size",
-    name: "Size",
-    options: [
-      { value: "2l", label: "2L", checked: false },
-      { value: "6l", label: "6L", checked: false },
-      { value: "12l", label: "12L", checked: false },
-      { value: "18l", label: "18L", checked: false },
-      { value: "20l", label: "20L", checked: false },
-      { value: "40l", label: "40L", checked: true },
-    ],
-  },
-];
-const products = [
-  {
-    id: 1,
-    name: "Nomad Pouch",
-    href: "#",
-    price: "$50",
-    availability: "White and Black",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-07-product-01.jpg",
-    imageAlt:
-      "White fabric pouch with white zipper, black zipper pull, and black elastic loop.",
-  },
-  {
-    id: 2,
-    name: "Zip Tote Basket",
-    href: "#",
-    price: "$140",
-    availability: "Washed Black",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-07-product-02.jpg",
-    imageAlt:
-      "Front of tote bag with washed black canvas body, black straps, and tan leather handles and accents.",
-  },
-  {
-    id: 3,
-    name: "Zip Tote Basket",
-    href: "#",
-    price: "$140",
-    availability: "Washed Black",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-07-product-02.jpg",
-    imageAlt:
-      "Front of tote bag with washed black canvas body, black straps, and tan leather handles and accents.",
-  },
+  { name: "Newest", value: "desc", key: "createdAt" },
+  { name: "Price: Low to High", value: "asc", key: "price" },
+  { name: "Price: High to Low", value: "desc", key: "price" },
 ];
 
 function classNames(...classes) {
@@ -104,7 +29,58 @@ function classNames(...classes) {
 }
 
 const Products = () => {
+  const dispatch = useDispatch();
+
+  const products = useSelector(selectProducts);
+  const _category = useSelector(selectCategory);
+
+  const [loading, setLoading] = useState(true);
+  const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sort, setSort] = useState({ ...sortOptions[0] });
+  const categoryName = useParams().id;
+
+  console.log("_category: ", _category);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(true);
+      dispatch(getCatetegory(categoryName));
+      setLoading(false);
+    }, 0);
+  }, [dispatch, categoryName]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (selectedSubCategories?.length) {
+        dispatch(
+          getProductsBySubCategories({
+            category: categoryName,
+            subCategories: selectedSubCategories,
+            sort,
+          })
+        );
+      } else {
+        dispatch(getProductsByCategory({ categoryName, sort }));
+      }
+      setLoading(false);
+    }, 0);
+  }, [dispatch, categoryName, selectedSubCategories, sort]);
+
+  const handleChangeSubCategories = (e) => {
+    const value = e.target.value;
+    const isChecked = e.target.checked;
+
+    setSelectedSubCategories((prevState) => {
+      if (isChecked) {
+        return [...prevState, value];
+      }
+      return [...prevState.filter((item) => item !== value)];
+    });
+  };
+
+  if (!_category.id && loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="bg-white">
@@ -152,20 +128,28 @@ const Products = () => {
                 {/* Filters */}
                 <form className="mt-4 border-t border-gray-200">
                   <h3 className="sr-only">Categories</h3>
-                  <ul
-                    role="list"
-                    className="font-medium text-gray-900 px-2 py-3"
-                  >
-                    {subCategories.map((category) => (
-                      <li key={category.name}>
-                        <a href={category.href} className="block px-2 py-3">
-                          {category.name}
-                        </a>
-                      </li>
-                    ))}
+                  <ul className="font-medium text-gray-900 px-2 py-3">
+                    {_category?.attributes?.sub_categories?.data &&
+                      _category?.attributes?.sub_categories?.data?.map(
+                        (subCategory) => (
+                          <li
+                            key={subCategory.id}
+                            onClick={handleChangeSubCategories}
+                            className="flex cursor-pointer"
+                          >
+                            <input
+                              key={subCategory.id}
+                              type="checkbox"
+                              value={subCategory.id}
+                              className="block px-2 py-3 mr-1"
+                            />
+                            <div>{subCategory.attributes.name}</div>
+                          </li>
+                        )
+                      )}
                   </ul>
 
-                  {filters.map((section) => (
+                  {/* {filters.map((section) => (
                     <Disclosure
                       as="div"
                       key={section.id}
@@ -221,7 +205,7 @@ const Products = () => {
                         </>
                       )}
                     </Disclosure>
-                  ))}
+                  ))} */}
                 </form>
               </div>
             </Transition.Child>
@@ -231,7 +215,7 @@ const Products = () => {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative z-10 flex items-baseline justify-between pt-24 pb-6 border-b border-gray-200">
             <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
-              New Arrivals
+              {categoryName}
             </h1>
 
             <div className="flex items-center">
@@ -260,18 +244,18 @@ const Products = () => {
                       {sortOptions.map((option) => (
                         <Menu.Item key={option.name}>
                           {({ active }) => (
-                            <a
-                              href={option.href}
+                            <button
+                              onClick={() => setSort(option)}
                               className={classNames(
                                 option.current
-                                  ? "font-medium text-gray-900"
-                                  : "text-gray-500",
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm"
+                                  ? "font-medium text-gray-900 w-full"
+                                  : "text-gray-500 w-full",
+                                active ? "bg-gray-100 w-full" : "w-full",
+                                "block px-4 py-2 text-sm w-full"
                               )}
                             >
                               {option.name}
-                            </a>
+                            </button>
                           )}
                         </Menu.Item>
                       ))}
@@ -280,13 +264,13 @@ const Products = () => {
                 </Transition>
               </Menu>
 
-              <button
+              {/* <button
                 type="button"
                 className="p-2 -m-2 ml-5 sm:ml-7 text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">View grid</span>
                 <ViewGridIcon className="w-5 h-5" aria-hidden="true" />
-              </button>
+              </button> */}
               <button
                 type="button"
                 className="p-2 -m-2 ml-4 sm:ml-6 text-gray-400 hover:text-gray-500 lg:hidden"
@@ -307,18 +291,26 @@ const Products = () => {
               {/* Filters */}
               <form className="hidden lg:block">
                 <h3 className="sr-only">Categories</h3>
-                <ul
-                  role="list"
-                  className="text-sm font-medium text-gray-900 space-y-4 pb-6 border-b border-gray-200"
-                >
-                  {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
-                    </li>
-                  ))}
+                <ul className="text-sm font-medium text-gray-900 space-y-4 pb-6 border-b border-gray-200">
+                  {_category?.attributes?.sub_categories?.data &&
+                    _category?.attributes?.sub_categories?.data?.map(
+                      (subCategory) => (
+                        <li
+                          key={subCategory.id}
+                          onClick={handleChangeSubCategories}
+                        >
+                          <input
+                            key={subCategory.id}
+                            type="checkbox"
+                            value={subCategory.id}
+                          ></input>
+                          <div>{subCategory.attributes.name}</div>
+                        </li>
+                      )
+                    )}
                 </ul>
 
-                {filters.map((section) => (
+                {/* {filters.map((section) => (
                   <Disclosure
                     as="div"
                     key={section.id}
@@ -374,14 +366,37 @@ const Products = () => {
                       </>
                     )}
                   </Disclosure>
-                ))}
+                ))} */}
               </form>
 
               {/* Product grid */}
               <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-                {products.map((product) => (
-                  <ProductCard1 key={product.id} product={product} />
-                ))}
+                {products &&
+                  products?.map((product) => {
+                    const {
+                      attributes: {
+                        name,
+                        description,
+                        price,
+                        image: { data: images },
+                      },
+                      id,
+                    } = product;
+                    return (
+                      <ProductCard1
+                        key={id}
+                        product={{
+                          name,
+                          description,
+                          price,
+                          imageSrc: images[0]?.attributes?.url,
+                          imageAlt: name,
+                          id,
+                          href: `/product/${id}`,
+                        }}
+                      />
+                    );
+                  })}
               </div>
             </div>
           </section>

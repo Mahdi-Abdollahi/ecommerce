@@ -1,96 +1,75 @@
-import { CheckIcon, ClockIcon } from "@heroicons/react/solid";
-import React from "react";
+import React, { memo } from "react";
+import { Link } from "react-router-dom";
 
-export const ProductCart = ({ product }) => {
-  const {
-    imageAlt,
-    imageSrc,
-    href,
-    name,
-    color,
-    size,
-    price,
-    inStock,
-    leadTime,
-    productIdx,
-  } = product;
+const ProductCart = ({ product, addItem, decreaseItem }) => {
   return (
     <li className="flex py-6 sm:py-10">
       <div className="flex-shrink-0">
         <img
-          src={imageSrc}
-          alt={imageAlt}
+          src={
+            process.env.REACT_APP_ASSETS_URL +
+            product.image.data[0].attributes.url
+          }
+          alt={product.name}
           className="w-24 h-24 rounded-lg object-center object-cover sm:w-32 sm:h-32"
         />
       </div>
 
-      <div className="relative ml-4 flex-1 flex flex-col justify-between sm:ml-6">
-        <div>
-          <div className="flex justify-between sm:grid sm:grid-cols-2">
+      <div className="relative ml-4 min-h-full flex-1 flex flex-col justify-between sm:ml-6">
+        <div className="h-full">
+          <div className="h-full flex justify-between sm:grid sm:grid-cols-2">
             <div className="pr-6">
               <h3 className="text-sm">
-                <a
-                  href={href}
+                <Link
+                  to={`/product/${product.name}`}
                   className="font-medium text-gray-700 hover:text-gray-800"
                 >
-                  {name}
-                </a>
+                  {product.name}
+                </Link>
               </h3>
-              <p className="mt-1 text-sm text-gray-500">{color}</p>
-              {size ? (
-                <p className="mt-1 text-sm text-gray-500">{size}</p>
-              ) : null}
             </div>
-
-            <p className="text-sm font-medium text-gray-900 text-right">
-              {price}
-            </p>
+            <div className="flex flex-col">
+              <p className="text-sm font-bold text-gray-900 text-right">
+                ${product.price.toFixed(2)}{" "}
+                <span className="text-green-700">*{product.amount}</span>
+              </p>
+              <div className="flex align-center ml-auto mt-auto">
+                <button
+                  className="inline-flex items-center justify-center w-10 h-10 text-white font-bold transition-colors duration-150 bg-red-700 rounded-lg focus:shadow-outline hover:bg-red-800 disabled:bg-gray-800"
+                  onClick={() => decreaseItem(product.id)}
+                >
+                  -
+                </button>
+                <div className="p-2 font-bold">{product?.amount}</div>
+                <button
+                  onClick={() => addItem({ ...product, id: product.id })}
+                  disabled={product?.amount >= product?.count}
+                  className="inline-flex items-center justify-center w-10 h-10  text-white font-bold transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800 disabled:bg-gray-800"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                    <path
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="mt-4 flex items-center sm:block sm:absolute sm:top-0 sm:left-1/2 sm:mt-0">
-            <label htmlFor={`quantity-${productIdx}`} className="sr-only">
-              Quantity, {name}
+            <label
+              htmlFor={`quantity-${product.productIdx}`}
+              className="sr-only"
+            >
+              Quantity, {product.name}
             </label>
-            <select
-              id={`quantity-${productIdx}`}
-              name={`quantity-${productIdx}`}
-              className="block max-w-full rounded-md border border-gray-300 py-1.5 text-base leading-5 font-medium text-gray-700 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-              <option value={6}>6</option>
-              <option value={7}>7</option>
-              <option value={8}>8</option>
-            </select>
-
-            <button
-              type="button"
-              className="ml-4 text-sm font-medium text-indigo-600 hover:text-indigo-500 sm:ml-0 sm:mt-3"
-            >
-              <span>Remove</span>
-            </button>
           </div>
         </div>
-
-        <p className="mt-4 flex text-sm text-gray-700 space-x-2">
-          {inStock ? (
-            <CheckIcon
-              className="flex-shrink-0 h-5 w-5 text-green-500"
-              aria-hidden="true"
-            />
-          ) : (
-            <ClockIcon
-              className="flex-shrink-0 h-5 w-5 text-gray-300"
-              aria-hidden="true"
-            />
-          )}
-
-          <span>{inStock ? "In stock" : `Ships in ${leadTime}`}</span>
-        </p>
       </div>
     </li>
   );
 };
+
+export default memo(ProductCart);

@@ -32,7 +32,7 @@ export const Category3 = () => {
         className="grid grid-rows-2 grid-cols-1 lg:grid-rows-1 lg:grid-cols-2"
       >
         {categories.map((category) => (
-          <div className="relative flex">
+          <div key={category.id} className="relative flex">
             <img
               src={category.imageSrc}
               alt={category.imageAlt}

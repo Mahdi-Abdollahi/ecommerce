@@ -1,85 +1,49 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 
 import { useState } from "react";
-import { RadioGroup } from "@headlessui/react";
-import { HeartIcon } from "@heroicons/react/outline";
 import ProductImages from "../../components/Product/ProductImages";
 import ProductInfo from "../../components/Product/ProductInfo";
 import ProductDetails from "../../components/Product/ProductDetails";
 import SimilarProducts from "../../components/SimilarProducts/SimilarProducts";
-
-const product = {
-  name: "Zip Tote Basket",
-  price: "$140",
-  rating: 4,
-  images: [
-    {
-      id: 1,
-      name: "Angled view",
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-03-product-01.jpg",
-      alt: "Angled front view with bag zipped and handles upright.",
-    },
-    {
-      id: 2,
-      name: "Angled view",
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-03-product-01.jpg",
-      alt: "Angled front view with bag zipped and handles upright.",
-    },
-    // More images...
-  ],
-  colors: [
-    {
-      name: "Washed Black",
-      bgColor: "bg-gray-700",
-      selectedColor: "ring-gray-700",
-    },
-    { name: "White", bgColor: "bg-white", selectedColor: "ring-gray-400" },
-    {
-      name: "Washed Gray",
-      bgColor: "bg-gray-500",
-      selectedColor: "ring-gray-500",
-    },
-  ],
-  description: `
-    <p>The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.</p>
-  `,
-  details: [
-    {
-      name: "Features",
-      items: [
-        "Multiple strap configurations",
-        "Spacious interior with top zip",
-        "Leather handle and tabs",
-        "Interior dividers",
-        "Stainless strap loops",
-        "Double stitched construction",
-        "Water-resistant",
-      ],
-    },
-    // More sections...
-  ],
-};
-const relatedProducts = [
-  {
-    id: 1,
-    name: "Zip Tote Basket",
-    color: "White and black",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/product-page-03-related-product-01.jpg",
-    imageAlt:
-      "Front of zip tote bag with white canvas, black canvas straps and handle, and black zipper pulls.",
-    price: "$140",
-  },
-  // More products...
-];
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getProductAndSimilarProducts,
+  selectProduct,
+  selectSimilarProducts,
+} from "../../features/product/productSlice";
+import { useParams } from "react-router-dom";
+import {
+  addToCart,
+  decreaseItem,
+  selectCartItems,
+} from "../../features/cart/cartSlice";
 
 const Product = () => {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  const dispatch = useDispatch();
+  const productId = useParams().id;
+  const _product = useSelector(selectProduct);
+  const similarProducts = useSelector(selectSimilarProducts);
+  const cartItems = useSelector(selectCartItems);
+  const productInCart = cartItems.find((product) => product.id === _product.id);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(getProductAndSimilarProducts(productId));
+    setLoading(false);
+  }, [dispatch, productId]);
+
+  const images = useMemo(() => {
+    if (loading) return [];
+    return _product?.attributes?.image?.data?.map((image) => ({
+      url: process.env.REACT_APP_ASSETS_URL + image.attributes.url,
+      id: image.attributes.hash,
+      alt: _product.attributes.name,
+    }));
+  }, [_product, loading]);
+  if (loading) {
+    return <div>Loading ...</div>;
+  }
 
   return (
     <div className="bg-white">
@@ -88,15 +52,16 @@ const Product = () => {
           {/* Product */}
           <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
             {/* Image gallery */}
-            <ProductImages images={product?.images} />
+            <ProductImages images={images} />
 
             {/* Product info */}
             <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-              <ProductInfo product={product} />
-
-              <form className="mt-6">
+              {_product?.attributes && (
+                <ProductInfo product={_product?.attributes} />
+              )}
+              <div className="mt-6">
                 {/* Colors */}
-                <div>
+                {/* <div>
                   <h3 className="text-sm text-gray-600">Color</h3>
 
                   <RadioGroup
@@ -135,35 +100,52 @@ const Product = () => {
                       ))}
                     </div>
                   </RadioGroup>
-                </div>
+                </div> */}
 
-                <div className="mt-10 flex sm:flex-col1">
+                <div className="mt-10 flex sm:flex-col1 align-center">
+                  {productInCart && (
+                    <>
+                      <button
+                        className="inline-flex items-center justify-center w-10 h-10 text-white font-bold transition-colors duration-150 bg-red-700 rounded-lg focus:shadow-outline hover:bg-indigo-800 disabled:bg-gray-800"
+                        onClick={() => dispatch(decreaseItem(_product.id))}
+                      >
+                        -
+                      </button>
+                      <div className="p-2 font-bold">
+                        {productInCart && productInCart?.amount}
+                      </div>
+                    </>
+                  )}
                   <button
-                    type="submit"
-                    className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:w-full"
+                    onClick={() =>
+                      dispatch(
+                        addToCart({ ..._product.attributes, id: _product.id })
+                      )
+                    }
+                    disabled={
+                      productInCart?.amount >= _product?.attributes?.count
+                    }
+                    className="inline-flex items-center justify-center w-10 h-10  text-white font-bold transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800 disabled:bg-gray-800"
                   >
-                    Add to bag
-                  </button>
-
-                  <button
-                    type="button"
-                    className="ml-4 py-3 px-3 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-500"
-                  >
-                    <HeartIcon
-                      className="h-6 w-6 flex-shrink-0"
-                      aria-hidden="true"
-                    />
-                    <span className="sr-only">Add to favorites</span>
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <path
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clipRule="evenodd"
+                        fillRule="evenodd"
+                      ></path>
+                    </svg>
                   </button>
                 </div>
-              </form>
+              </div>
 
               <section aria-labelledby="details-heading" className="mt-12">
                 <h2 id="details-heading" className="sr-only">
                   Additional details
                 </h2>
 
-                <ProductDetails details={product.details} />
+                {_product?.attributes?.details && (
+                  <ProductDetails details={_product.attributes.details} />
+                )}
               </section>
             </div>
           </div>
@@ -179,7 +161,7 @@ const Product = () => {
               Customers also bought
             </h2>
 
-            <SimilarProducts relatedProducts={relatedProducts} />
+            <SimilarProducts relatedProducts={similarProducts} />
           </section>
         </div>
       </main>

@@ -76,7 +76,7 @@ const navigation = {
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800">
+    <footer className="bg-gray-800 mt-auto">
       <div className="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
         <nav
           className="-mx-5 -my-2 flex flex-wrap justify-center"
