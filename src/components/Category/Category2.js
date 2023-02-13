@@ -3,30 +3,30 @@ import CategoryCard2 from "../Card/CategoryCard/CategoryCard2";
 
 const categories = [
   {
-    name: "Handcrafted Collection",
-    href: "#",
+    name: "Women",
+    href: "/products/women",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-collection-01.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-04-collection-01.jpg",
     imageAlt:
       "Brown leather key ring with brass metal loops and rivets on wood table.",
     description:
       "Keep your phone, keys, and wallet together, so you can lose everything at once.",
   },
   {
-    name: "Organized Desk Collection",
-    href: "#",
+    name: "Men",
+    href: "/products/men",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-collection-02.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-04-collection-02.jpg",
     imageAlt:
       "Natural leather mouse pad on white desk next to porcelain mug and keyboard.",
     description:
       "The rest of the house will still be a mess, but your desk will look great.",
   },
   {
-    name: "Focus Collection",
-    href: "#",
+    name: "All",
+    href: "/products/all",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-collection-03.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-04-collection-03.jpg",
     imageAlt:
       "Person placing task list card into walnut card holder next to felt carrying case on leather desk pad.",
     description:

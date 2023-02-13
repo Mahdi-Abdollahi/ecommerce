@@ -3,7 +3,11 @@ import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { CheckCircleIcon, TrashIcon } from "@heroicons/react/solid";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItem, selectCartItems } from "../../features/cart/cartSlice";
+import {
+  removeAllItems,
+  removeItem,
+  selectCartItems,
+} from "../../features/cart/cartSlice";
 import { Link } from "react-router-dom";
 import { TAX_COST } from "../../constants/constants";
 import { postOrder } from "../../features/order/orderSlice";
@@ -52,7 +56,7 @@ const Checkout = () => {
   const cartItems = useSelector(selectCartItems);
   const _dispatch = useDispatch();
   const { user } = useContext(AuthContext);
-
+  const [completePurchase, setCompletePurchase] = useState(false);
   //   const navigation = useNavigate();
 
   const [formData, dispatch] = useReducer(formReducer, initialState);
@@ -70,7 +74,23 @@ const Checkout = () => {
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(
     deliveryMethods[0]
   );
-
+  if (completePurchase) {
+    <div className="w-full">
+      <div className="h-80 bg-gray-600 rounded-lg mt-auto mx-auto w-6/12 border flex flex-col justify-center items-center">
+        <div className=" text-white">Your Order Submitted :)</div>
+        <div className="mt-6 text-sm text-center text-gray-500">
+          <p>
+            <Link
+              to="/products/all"
+              className="text-white font-medium hover:text-indigo-500"
+            >
+              Continue Shopping<span aria-hidden="true"> &rarr;</span>
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>;
+  }
   if (!cartItems?.length) {
     return (
       <div className="w-full">
@@ -509,7 +529,7 @@ const Checkout = () => {
 
               <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
                 <button
-                  onClick={() =>
+                  onClick={() => {
                     _dispatch(
                       postOrder({
                         shipping: JSON.stringify(formData),
@@ -525,8 +545,9 @@ const Checkout = () => {
                           selectedDeliveryMethod.price +
                           TAX_COST,
                       })
-                    )
-                  }
+                    ).then(() => setCompletePurchase(true));
+                    _dispatch(removeAllItems());
+                  }}
                   className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                 >
                   Confirm order

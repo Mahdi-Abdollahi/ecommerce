@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
@@ -11,12 +11,14 @@ import {
   selectAllCategory,
 } from "../../features/category/categorySlice";
 import { selectCartItems } from "../../features/cart/cartSlice";
+import { AuthContext } from "../../context/AuthContext";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Navbar = () => {
+  const { logout, user } = useContext(AuthContext);
   const dispatch = useDispatch();
   const categories = useSelector(selectAllCategory);
   const cartItems = useSelector(selectCartItems);
@@ -139,13 +141,13 @@ const Navbar = () => {
               </div>
               <div className="hidden lg:block lg:ml-4">
                 <div className="flex items-center">
-                  <button
+                  {/* <button
                     type="button"
                     className="flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                   >
                     <span className="sr-only">View notifications</span>
                     <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                  </button> */}
 
                   {/* Profile dropdown */}
                   <Menu as="div" className="ml-4 relative flex-shrink-0">
@@ -184,15 +186,15 @@ const Navbar = () => {
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <Link
-                              to="/"
+                            <button
+                              onClick={logout}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
                               Sign out
-                            </Link>
+                            </button>
                           )}
                         </Menu.Item>
                       </Menu.Items>
@@ -253,39 +255,46 @@ const Navbar = () => {
               })}
             </div>
             <div className="pt-4 pb-3 border-t border-gray-700">
-              <div className="flex items-center px-5">
-                <div className="flex-shrink-0">
+              {user && (
+                <div className="flex items-center px-5">
+                  {/* <div className="flex-shrink-0">
                   <img
                     className="h-10 w-10 rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt=""
                   />
-                </div>
-                <div className="ml-3">
-                  <div className="text-base font-medium text-white">
-                    Tom Cook
+                </div> */}
+                  <div className="ml-3">
+                    <div className="text-base font-medium text-white">
+                      {user.username}
+                    </div>
+                    <div className="text-sm font-medium text-gray-400">
+                      {user.email}
+                    </div>
                   </div>
-                  <div className="text-sm font-medium text-gray-400">
-                    tom@example.com
-                  </div>
                 </div>
-              </div>
-              <div className="mt-3 px-2 space-y-1">
-                <Disclosure.Button
-                  as={Link}
-                  to="/profile"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                >
-                  Your Profile
-                </Disclosure.Button>
-                <Disclosure.Button
-                  as={Link}
-                  to="/"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                >
-                  Sign out
-                </Disclosure.Button>
-              </div>
+              )}
+
+              {user ? (
+                <div className="mt-3 px-2 space-y-1">
+                  <button
+                    onClick={logout}
+                    className="w-full block px-3 py-2 rounded-md text-left text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-3 px-2 space-y-1">
+                  <Disclosure.Button
+                    as={Link}
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                  >
+                    Log In
+                  </Disclosure.Button>
+                </div>
+              )}
             </div>
           </Disclosure.Panel>
         </>

@@ -1,16 +1,40 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 const Login = () => {
-  const { login, error, loading } = useContext(AuthContext);
+  const { login, loading, user } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigation = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
     await login(email, password);
+    navigation("/");
   };
+
+  if (user) {
+    return (
+      <div className="bg-gray-800 min-h-screen flex flex-col">
+        <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
+          <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full text-center">
+            You have Already Have Account!!!
+            <div className="text-grey-dark mt-6 ">
+              Back to Home page
+              <div>
+                <Link
+                  className="no-underline border-b border-blue text-blue"
+                  to="/"
+                >
+                  HOME
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 min-h-screen flex flex-col">

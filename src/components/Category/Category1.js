@@ -4,34 +4,22 @@ import { Link } from "react-router-dom";
 
 const categories = [
   {
-    name: "New Arrivals",
-    href: "#",
+    name: "Women",
+    href: "/products/women",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-category-01.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-03-hero-image-tile-01.jpg",
   },
   {
-    name: "Productivity",
-    href: "#",
+    name: "Men",
+    href: "/products/men",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-category-02.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-03-hero-image-tile-05.jpg",
   },
   {
-    name: "Workspace",
-    href: "#",
+    name: "All Procuts",
+    href: "/products/all",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-category-04.jpg",
-  },
-  {
-    name: "Accessories",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-category-05.jpg",
-  },
-  {
-    name: "Sale",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-01-category-03.jpg",
+      "https://tailwindui.com/img/ecommerce-images/home-page-03-category-01.jpg",
   },
 ];
 
@@ -44,7 +32,7 @@ const Category1 = () => {
             Shop by Category
           </h2>
           <Link
-            to="/products/1"
+            to="/products/all"
             className="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block"
           >
             Browse all categories<span aria-hidden="true"> &rarr;</span>

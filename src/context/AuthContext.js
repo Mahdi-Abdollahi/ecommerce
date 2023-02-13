@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, callback) => {
     setLoading(true);
     try {
       const data = await authAPI.login(email, password);

@@ -19,6 +19,7 @@ const login = async (email, password) => {
 };
 
 const logout = () => {
+  console.log("DFSDF");
   localStorage.removeItem("jwt");
   localStorage.removeItem("user");
 };

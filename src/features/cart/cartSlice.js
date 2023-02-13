@@ -38,7 +38,7 @@ export const cartSlice = createSlice({
       );
     },
     removeAllItems: (state) => {
-      state.products = [];
+      state.cartProducts = [];
     },
   },
 });
